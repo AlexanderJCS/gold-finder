@@ -12,8 +12,13 @@ def main():
         
         gold_locations = gf.GoldFinder(masked).find_gold()
         
-        plt.imshow(np.array(bundle.image), cmap="gray")
-        plt.scatter(x=[coord[0] for coord in gold_locations], y=[coord[1] for coord in gold_locations], c="red")
+        plt.imshow(np.array(masked), cmap="gray")
+        plt.scatter(
+            x=[coord[0] for coord in gold_locations],
+            y=[coord[1] for coord in gold_locations],
+            c="red",
+            alpha=0.5
+        )
         plt.show()
         
         bundle.image.close()
