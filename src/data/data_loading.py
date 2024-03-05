@@ -8,6 +8,7 @@ import pathlib
 
 @dataclass
 class ImageBundle:
+    name: str
     image: Image
     mask: Image
     ground_truth_6nm: pd.DataFrame | None
@@ -19,7 +20,7 @@ def get_image_bundles(base_path) -> Iterator[ImageBundle]:
         if not subdir.is_dir():
             continue
         
-        bundle = ImageBundle(None, None, None, None)
+        bundle = ImageBundle(subdir.name, None, None, None, None)
         
         for file in subdir.iterdir():
             if file.is_file() and file.suffix == ".tif" and "mask" not in file.name and "color" not in file.name:

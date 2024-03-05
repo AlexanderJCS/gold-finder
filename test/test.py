@@ -1,5 +1,3 @@
-import math
-
 import pandas as pd
 
 from unittest import TestCase
@@ -16,7 +14,7 @@ MICRON_OFFSET_Y = 0.01479  # the ground truth data is offset by a fixed amount. 
 
 class AccuracyTest(TestCase):
     @staticmethod
-    def verify_gold(gold_locations, ground_truth_6nm, ground_truth_12nm):
+    def get_confusion_matrix(name, gold_locations, ground_truth_6nm, ground_truth_12nm):
         true_positive_12nm = 0
         true_positive_6nm = 0
         
@@ -48,22 +46,30 @@ class AccuracyTest(TestCase):
             "6nm": [true_positive_6nm, false_negitive_6nm]
         }, index=["true positive", "false negative"])
         
-        print("--- CONFUSION MATRICES ---")
-        print(f"False positives: {false_positive}")
+        print(f"--- CONFUSION MATRICES FOR {name} ---")
+        print(f"false positives: {false_positive}")
         print(confusion_matrix_df)
+        print()
+        
+        return false_positive, confusion_matrix_df
     
     def test_accuracy(self):
         image_bundles = list(dl.get_image_bundles("../data/analyzed synapses/"))
         
-        # for bundle in image_bundles:
-        #     self.assertIsNotNone(bundle.image)
-        #     self.assertIsNotNone(bundle.mask)
-        #     self.assertIsNotNone(bundle.ground_truth_6nm)
-        #     self.assertIsNotNone(bundle.ground_truth_12nm)
+        for bundle in image_bundles:
+            self.assertIsNotNone(bundle.image, msg=f"Bundle name: {bundle.name}")
+            self.assertIsNotNone(bundle.mask, msg=f"Bundle name: {bundle.name}")
+            self.assertEqual(bundle.image.size, bundle.mask.size, msg=f"Bundle name: {bundle.name}")
+            self.assertIsNotNone(bundle.ground_truth_6nm, msg=f"Bundle name: {bundle.name}")
+            self.assertIsNotNone(bundle.ground_truth_12nm, msg=f"Bundle name: {bundle.name}")
         
         if len(image_bundles) == 0:
             self.fail("No image bundles were found")
         
+        confusion_matrices = []
+        sum_false_positives = 0
+        
+        # Calculate the gold locations and get the confusion matrices
         for bundle in image_bundles:
             bundle.ground_truth_6nm["X"] -= MICRON_OFFSET_X
             bundle.ground_truth_6nm["Y"] -= MICRON_OFFSET_Y
@@ -73,10 +79,27 @@ class AccuracyTest(TestCase):
             
             masked = masking.apply_mask(bundle.image, bundle.mask)
             gold_locations = gf.GoldFinder(masked).find_gold()
-            self.verify_gold(gold_locations, bundle.ground_truth_6nm, bundle.ground_truth_12nm)
-            break
-
-
-def dist(a, b):
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-
+            
+            false_positives, confusion_matrix = self.get_confusion_matrix(
+                bundle.name,
+                gold_locations,
+                bundle.ground_truth_6nm,
+                bundle.ground_truth_12nm
+            )
+            
+            sum_false_positives += false_positives
+            confusion_matrices.append(confusion_matrix)
+        
+        # Calculate the summed confusion matrix
+        summed_confusion_matrix = pd.DataFrame({
+            "12nm": [0, 0],
+            "6nm": [0, 0]
+        }, index=["true positive", "false negative"])
+        
+        for matrix in confusion_matrices:
+            summed_confusion_matrix += matrix
+            
+        print("\n--- SUMMED CONFUSION MATRIX ---")
+        print(f"false positives: {sum_false_positives}")
+        print(summed_confusion_matrix)
+        
