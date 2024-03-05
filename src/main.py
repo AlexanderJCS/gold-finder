@@ -22,7 +22,7 @@ def main():
         plt.show()
         
         bundle.image.close()
-        break
+        input("Press enter to continue")
 
 
 if __name__ == "__main__":
