@@ -1,0 +1,1 @@
+All .tif images in this directory and subdirectories are rotated counterclockwise by 90 degrees to be accurately read by the program
