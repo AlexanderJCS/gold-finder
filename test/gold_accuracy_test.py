@@ -6,7 +6,8 @@ from src.helper import masking, unit_conversion as uc
 from src.gold_finder import gold_finder as gf, data_loading as dl
 
 
-POSITIVE_DISTANCE = 0.01  # units: micrometers, the leeway for a predicted gold particle position vs actual position
+POSITIVE_DISTANCE_NM = 10  # units: nanometers, the leeway for a predicted gold particle position vs actual position
+POSITIVE_DISTANCE_MICRONS = POSITIVE_DISTANCE_NM / 1000
 
 
 class AccuracyTest(TestCase):
@@ -26,10 +27,10 @@ class AccuracyTest(TestCase):
             distances_12nm = ((ground_truth_12nm["X"] - micron_location[0]) ** 2 +
                               (ground_truth_12nm["Y"] - micron_location[1]) ** 2) ** 0.5
 
-            if any(distances_12nm <= POSITIVE_DISTANCE):
+            if any(distances_12nm <= POSITIVE_DISTANCE_MICRONS):
                 true_positive_12nm += 1
             
-            elif any(distances_6nm <= POSITIVE_DISTANCE):
+            elif any(distances_6nm <= POSITIVE_DISTANCE_MICRONS):
                 true_positive_6nm += 1
             
             else:
