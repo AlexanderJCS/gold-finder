@@ -1,0 +1,1 @@
+Removed "part 2" from this directory because of issues with how the program parses the data. Part 2 can be found in the S22.2 directory.
