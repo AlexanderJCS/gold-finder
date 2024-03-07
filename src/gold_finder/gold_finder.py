@@ -117,6 +117,7 @@ class GoldFinder:
         """
         
         splotch_coords = self.get_all_splotch_coords(image_data, coords)
+        self.processed_coords.update(splotch_coords)  # optimization that prevents analyzing the same splotch twice
         
         if len(splotch_coords) < self.min_pixels:
             return False, coords
@@ -128,7 +129,6 @@ class GoldFinder:
             return False, splotch_center
         
         perimeter_coords = self.get_perimeter_coords(splotch_coords)
-        self.processed_coords.update(splotch_coords)  # optimization that prevents analyzing the same splotch twice
         
         # Find the closest distance from the perimeter coords to splotch center
         incircle_rad_squared = float("inf")
