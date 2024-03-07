@@ -8,9 +8,6 @@ from src.data import gold_finder as gf, data_loading as dl
 
 POSITIVE_DISTANCE = 0.01  # units: micrometers, the leeway for a predicted gold particle position vs actual position
 
-MICRON_OFFSET_X = 0.00822  # the ground truth data is offset by a fixed amount. this offset is equivalen to 15 pixels
-MICRON_OFFSET_Y = 0.01479  # the ground truth data is offset by a fixed amount. this offset is equivalent to 27 pixels
-
 
 class AccuracyTest(TestCase):
     @staticmethod
@@ -71,12 +68,6 @@ class AccuracyTest(TestCase):
         
         # Calculate the gold locations and get the confusion matrices
         for bundle in image_bundles:
-            bundle.ground_truth_6nm["X"] -= MICRON_OFFSET_X
-            bundle.ground_truth_6nm["Y"] -= MICRON_OFFSET_Y
-
-            bundle.ground_truth_12nm["X"] -= MICRON_OFFSET_X
-            bundle.ground_truth_12nm["Y"] -= MICRON_OFFSET_Y
-            
             masked = masking.apply_mask(bundle.image, bundle.mask)
             gold_locations = gf.GoldFinder(masked).find_gold()
             
