@@ -6,7 +6,7 @@ import numpy as np
 
 
 class GoldFinder:
-    def __init__(self, image: Image, mask_threshold: float = 0.325, circle_threshold: float = 0.4, min_pixels: int = 5):
+    def __init__(self, image: Image, mask_threshold: float = 0.4, circle_threshold: float = 0.25, min_pixels: int = 5):
         """
         
         :param image: The image (which only has a luminosity channel) to analyze
