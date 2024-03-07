@@ -1,3 +1,5 @@
+from numbers import Number
+
 import math
 import networkx as nx
 
@@ -19,7 +21,7 @@ def gen_network(points):
     return nx.minimum_spanning_tree(g)
     
 
-def density(points: list[tuple[int, int]]) -> float:
+def density(points: list[tuple[Number, Number]]) -> float:
     """
     Finds the density of a set of points using the minimum spanning tree of the network of the points, using distance as
     weight.
