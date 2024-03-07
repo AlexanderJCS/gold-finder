@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.data import data_loading as dl
-from src.data import gold_finder as gf
+from src.gold_finder import data_loading as dl
+from src.gold_finder import gold_finder as gf
 from src.helper import masking
 
 

@@ -3,7 +3,7 @@ import pandas as pd
 from unittest import TestCase
 
 from src.helper import masking, unit_conversion as uc
-from src.data import gold_finder as gf, data_loading as dl
+from src.gold_finder import gold_finder as gf, data_loading as dl
 
 
 POSITIVE_DISTANCE = 0.01  # units: micrometers, the leeway for a predicted gold particle position vs actual position

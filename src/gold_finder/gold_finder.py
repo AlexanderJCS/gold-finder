@@ -53,7 +53,7 @@ class GoldFinder:
         """
         Returns all coordinates of a splotch
 
-        :param image_data: The image data
+        :param image_data: The image gold_finder
         :param coords: A coordinate that is on the splotch
         :param splotch_coords: A set of coordinates that are already known to be part of the splotch
         :return: A list of coordinates that are part of the splotch
@@ -111,7 +111,7 @@ class GoldFinder:
     def analyze_splotch(self, image_data: np.array, coords: tuple[int, int]) \
             -> tuple[bool, tuple[int, int]]:
         """
-        :param image_data: The image data
+        :param image_data: The image gold_finder
         :param coords: A coordinate that is on the splotch
         :return: [if it is a circle, center of the splotch]
         """
