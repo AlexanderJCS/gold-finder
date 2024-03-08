@@ -43,7 +43,12 @@ class GoldFinder:
         return [(coord[1], coord[0]) for coord in circle_coords]
     
     def get_avg_luminosity(self) -> float:
-        return np.mean(np.array(self.image))
+        image_array = np.array(self.image.getdata())
+        filtered_array = image_array[image_array < 255]
+        # filter the array to remove white pixels since applying the
+        # mask will make all masked pixels white. This can skew results
+        
+        return np.mean(filtered_array)
     
     def mask_on_luminosity(self, threshold: float) -> Image:
         return self.image.point(lambda p: int(p < threshold), mode="1")
