@@ -1,4 +1,4 @@
-PIXEL_PER_NM = 500 / 279  # all images in the datset that I've seen has this scale
+PIXEL_PER_NM = 1.8  # all images in the datset that I've seen has this scale
 PIXEL_PER_MICRON = PIXEL_PER_NM * 1000
 
 
@@ -14,9 +14,9 @@ def pixels_to_microns(*args: int, pixels_per_micron: float = PIXEL_PER_MICRON) -
     return tuple(arg / pixels_per_micron for arg in args)
 
 
-def nm_to_pixels(*args: float, pixels_per_micron: float = PIXEL_PER_MICRON) -> tuple[int, ...]:
+def micron_to_pixels(*args: float, pixels_per_micron: float = PIXEL_PER_MICRON) -> tuple[int, ...]:
     """
-    Converts nanometer coordinates to pixels
+    Converts micron coordinates to pixels
     
     :param args: The micron coordinates
     :param pixels_per_micron: The conversion ratio of pixels to nanometers
