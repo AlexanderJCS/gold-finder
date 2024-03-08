@@ -6,11 +6,12 @@ import numpy as np
 
 
 class GoldFinder:
-    def __init__(self, image: Image, mask_threshold: float = 0.6, circle_threshold: float = 0.4, min_pixels: int = 15):
+    def __init__(self, image: Image, mask_threshold: float = 0.7, circle_threshold: float = 0.4, min_pixels: int = 15):
         """
         
         :param image: The image (which only has a luminosity channel) to analyze
-        :param mask_threshold: The threshold to color a pixel white instead of black (e.g., 0.1 means luminosity < 25.5)
+        :param mask_threshold: The percnt lower than the average luminosity that a pixel must be to be considered part
+                                of a splotch
         :param circle_threshold: The percentage of points that must be within the inscribed circle for the splotch to be
                             considered a circle
         :param min_pixels: The minimum number of pixels for a splotch to be considered a gold particle
