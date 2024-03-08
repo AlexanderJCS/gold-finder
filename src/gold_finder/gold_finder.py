@@ -6,7 +6,7 @@ import numpy as np
 
 
 class GoldFinder:
-    def __init__(self, image: Image, mask_threshold: float = 0.5, circle_threshold: float = 0.4, min_pixels: int = 15):
+    def __init__(self, image: Image, mask_threshold: float = 0.6, circle_threshold: float = 0.4, min_pixels: int = 15):
         """
         
         :param image: The image (which only has a luminosity channel) to analyze
@@ -28,7 +28,8 @@ class GoldFinder:
         :return: A list of coordinates of the gold particles, in pixels
         """
         
-        masked = self.mask_on_luminosity()
+        masked = self.mask_on_luminosity(self.get_avg_luminosity() * self.mask_threshold)
+        masked.show()
         bool_array = np.array(masked.getdata()).reshape(masked.size[::-1])
         
         original_recursion_limit = sys.getrecursionlimit()
@@ -40,9 +41,12 @@ class GoldFinder:
         
         # flip the x and y for some reason
         return [(coord[1], coord[0]) for coord in circle_coords]
-        
-    def mask_on_luminosity(self) -> Image:
-        return self.image.point(lambda p: p < 255 * self.mask_threshold, mode="1")
+    
+    def get_avg_luminosity(self) -> float:
+        return np.mean(np.array(self.image))
+    
+    def mask_on_luminosity(self, threshold: float) -> Image:
+        return self.image.point(lambda p: int(p < threshold), mode="1")
     
     @staticmethod
     def get_all_splotch_coords(
