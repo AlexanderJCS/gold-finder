@@ -30,7 +30,6 @@ class GoldFinder:
         """
         
         masked = self.mask_on_luminosity(self.get_avg_luminosity() * self.mask_threshold)
-        masked.show()
         bool_array = np.array(masked.getdata()).reshape(masked.size[::-1])
         
         original_recursion_limit = sys.getrecursionlimit()
