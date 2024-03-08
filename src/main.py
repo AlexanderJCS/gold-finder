@@ -14,7 +14,7 @@ def show_points_on_image(image, points):
         x=[coord[0] for coord in points],
         y=[coord[1] for coord in points],
         c="red",
-        alpha=0.5,
+        alpha=0.25,
         s=5
     )
     
@@ -23,7 +23,7 @@ def show_points_on_image(image, points):
 
 def main():
     for bundle in dl.get_image_bundles("../data/analyzed synapses/"):
-        if bundle.name != "S1":
+        if bundle.name != "S29":
             continue
         
         apply_mask = True
