@@ -23,12 +23,13 @@ def show_points_on_image(image, points):
 
 def main():
     for bundle in dl.get_image_bundles("../data/analyzed synapses/"):
-        if bundle.name != "S1":
+        if bundle.name != "S25":
             continue
         
         show_points_on_image(bundle.image, [])
         
-        masked = masking.apply_mask(bundle.image, bundle.mask)
+        apply_mask = False
+        masked = masking.apply_mask(bundle.image, bundle.mask) if apply_mask else bundle.image
         
         gold_locations = gf.GoldFinder(masked).find_gold()
         density_score = density.density(gold_locations)
