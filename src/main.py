@@ -23,8 +23,10 @@ def show_points_on_image(image, points):
 
 def main():
     for bundle in dl.get_image_bundles("../data/analyzed synapses/"):
-        if bundle.name != "S22.1":
+        if bundle.name != "S1":
             continue
+        
+        show_points_on_image(bundle.image, [])
         
         masked = masking.apply_mask(bundle.image, bundle.mask)
         
