@@ -123,5 +123,12 @@ def crop_scale_bar(image: Image, bar_position: BarPosition) -> Image:
     :return: The cropped image
     """
 
-    return image.crop((*bar_position.get_offset(image.size), image.width, image.height))
+    bar_offset = bar_position.get_offset(image.size)
+    width_height_min = min(image.width, image.height)
+
+    return image.crop((
+            *bar_position.get_offset(image.size),
+            width_height_min if bar_offset[0] == 0 else image.width,
+            width_height_min if bar_offset[1] == 0 else image.height
+    ))
     
