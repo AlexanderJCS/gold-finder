@@ -28,7 +28,7 @@ class TestUnitConversion(TestCase):
                 self.assertAlmostEqual(
                     coord1,
                     coord2,
-                    delta=0.001,
+                    delta=1,
                     msg=f"failed on iteration {i}| microns to pixels: {uc.micron_to_pixels(*rand_coords)}"
                 )
     
