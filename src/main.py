@@ -37,8 +37,6 @@ def main():
         show_points_on_image(masked, gold_locations)
         
         bundle.image.close()
-        
-        input("Press enter to continue: ")
 
 
 if __name__ == "__main__":
