@@ -25,8 +25,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument(
         "-m", "--mask",
         action="store_true",
-        help="Whether to apply the mask to the image before finding gold particles. Does not apply the mask if it "
-             "cannot find it. Default: False"
+        help="Whether to apply the mask to the image before finding gold particles. Default: False"
     )
     
     parser.add_argument(
