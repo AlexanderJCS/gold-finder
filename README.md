@@ -5,7 +5,7 @@ Golden uses a 'traditional algorithm' (non-machine learning) approach to identif
 
 ## Python Version
 
-Please use Python 3.12 or later with this project. Earlier versions are not guaranteed to work.
+Please use Python 3.12 or later with this project. Earlier versions are not guaranteed to work (3.11+ will probably work, but it may break in the future).
 
 ## Dataset
 Uses the immunogold dataset from Max Planck Florida Institute for Neuroscience. The paper is linked [here](https://www.researchgate.net/publication/350731155_A_deep_learning_approach_to_identifying_immunogold_particles_in_electron_microscopy_images).
