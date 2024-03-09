@@ -53,10 +53,9 @@ class AccuracyTest(TestCase):
             "6nm": [true_positive_6nm, false_negitive_6nm]
         }, index=["true positive", "false negative"])
         
-        print(f"--- CONFUSION MATRIX FOR {bundle.name} ---")
+        print(f"\n--- CONFUSION MATRIX FOR {bundle.name} ---")
         print(f"false positives: {false_positive}")
         print(confusion_matrix_df)
-        print()
         
         return false_positive, confusion_matrix_df
     
