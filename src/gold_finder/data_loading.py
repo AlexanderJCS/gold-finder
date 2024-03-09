@@ -19,25 +19,22 @@ class BarPosition(Enum):
     LEFT = 2
     RIGHT = 3
     
-    def get_offset(self, image_dim: tuple[int, int]) -> tuple[int, int]:
+    def bar_location(self, image_dim: tuple[int, int]) -> tuple[int, int, int, int]:
         """
         Gets the offset of the scale bar from the edge of the image
-        :return: A pixel offset from the edge of the image, in the order (left, top)
+        :return: A 4-element tuple that represents the scale bar position (left, top, right, bottom)
         """
         
+        bar_width = abs(image_dim[0] - image_dim[1])
+        
         if self == BarPosition.TOP:
-            return 0, image_dim[1] - image_dim[0]
-        
+            return 0, 0, image_dim[0], bar_width
         if self == BarPosition.BOTTOM:
-            return 0, 0
-        
+            return 0, image_dim[1] - bar_width, image_dim[0], image_dim[1]
         if self == BarPosition.LEFT:
-            return image_dim[0] - image_dim[1], 0
-        
+            return 0, 0, bar_width, image_dim[1]
         if self == BarPosition.RIGHT:
-            return 0, 0
-        
-        raise ValueError("Invalid BarPosition")
+            return image_dim[0] - bar_width, 0, image_dim[0], image_dim[1]
     
     @staticmethod
     def bar_pos(image: Image) -> BarPosition:
@@ -65,7 +62,6 @@ class ImageBundle:
     name: str
     image: Image
     mask: Image
-    scale_bar_pos: BarPosition | None
     ground_truth_6nm: pd.DataFrame | None
     ground_truth_12nm: pd.DataFrame | None
 
@@ -75,22 +71,24 @@ def get_image_bundles(base_path) -> Iterator[ImageBundle]:
         if not subdir.is_dir():
             continue
         
-        bundle = ImageBundle(subdir.name, None, None, None, None, None)
+        bundle = ImageBundle(subdir.name, None, None, None, None)
         
         # Load the image
+        scale_bar = None
+        
         for file in subdir.iterdir():
             if file.is_file() and file.suffix == ".tif" and "mask" not in file.name and "color" not in file.name:
-                bundle.scale_bar_pos = BarPosition.bar_pos(Image.open(file).convert("L"))
-                bundle.image = load_image(file, bundle.scale_bar_pos)
+                scale_bar = BarPosition.bar_pos(Image.open(file).convert("L"))
+                bundle.image = load_image(file, scale_bar)
                 break
         
-        if bundle.image is None or bundle.scale_bar_pos is None:
+        if bundle.image is None or scale_bar is None:
             raise FileNotFoundError(f"No image found for {bundle.name}!")
         
         # Load the mask if it exists
         mask_files = list(subdir.glob("*mask.tif"))
         if len(mask_files) > 0:
-            bundle.mask = load_image(mask_files[0], bundle.scale_bar_pos)
+            bundle.mask = load_image(mask_files[0], scale_bar)
         
         for file in (subdir / "Results").glob("*.csv"):
             if "6nm" in file.name:
@@ -111,24 +109,17 @@ def load_image(path: pathlib.Path, src_img_bar_pos: BarPosition) -> Image:
     """
     
     image = Image.open(path)
-    return crop_scale_bar(image.convert("L"), src_img_bar_pos)
+    return fill_scale_bar(image.convert("L"), src_img_bar_pos)
 
 
-def crop_scale_bar(image: Image, bar_position: BarPosition) -> Image:
+def fill_scale_bar(image: Image, bar_position: BarPosition) -> Image:
     """
-    Crops the scale bar from the image
+    Fills the scale bar with white, which effectively allows it to be ignored when finding gold particles
     
-    :param image: The image to crop
+    :param image: The image to paste the scale bar onto. This image will be modified
     :param bar_position: The position of the scale bar
-    :return: The cropped image
+    :return: The modified image
     """
-
-    bar_offset = bar_position.get_offset(image.size)
-    width_height_min = min(image.width, image.height)
-
-    return image.crop((
-            *bar_position.get_offset(image.size),
-            width_height_min if bar_offset[0] == 0 else image.width,
-            width_height_min if bar_offset[1] == 0 else image.height
-    ))
     
+    image.paste(255, bar_position.bar_location(image.size))
+    return image
