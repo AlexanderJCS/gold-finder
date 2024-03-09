@@ -29,17 +29,52 @@ Installation is complete. To use the program, see the [usage section](#usage).
 
 ## Usage
 
-Run `main.py` by executing:
+View the help info by running the program with the `-h` flag:
 
 ```bash
-python -m src.main
+# from the repository's root dir
+$ python -m src.main -h
 ```
+
+This will show the following help info:
+```
+usage: Golden [-h] [-m] [-v] name
+
+Find gold particles and their density in electron microscopy images
+
+positional arguments:
+  name          The name of the dataset to analyze. This is the name of the folder in the 'analyzed synapses' directory,e.g., 'S1' or 'S7'
+
+options:
+  -h, --help    show this help message and exit
+  -m, --mask    Whether to apply the mask to the image before finding gold particles. Default: False
+  -v, --visual  Whether to display the image with the gold particles marked on it. Default: False
+```
+
+
+To run the program, use the following command:
+
+```bash
+# from the repository's root dir
+$ python -m src.main S1
+
+# S1 is the name of the image bundle to analyze, e.g., "S1", "S4", "S7" etc.
+# See a full list by looking at the directory names in the "analyzed synapses" directory
+```
+
+You can also add the following flags:
+
+| Flag               | Action                                                                   |
+|--------------------|--------------------------------------------------------------------------|
+| `-m` or `--mask`   | Whether to apply the image mask found in the image bundle                |
+| `-v` or `--visual` | Whether to use matplotlib to show the results visually after calculation |
 
 ## Tests
 
 To test the project, first navigate to the test package:
 
 ```bash
+# from the repository's root dir
 $ cd test
 ```
 
