@@ -1,9 +1,11 @@
 import pandas as pd
+import numpy as np
 
 from unittest import TestCase
 
-from src.helper import masking, unit_conversion as uc
-from src.gold_finder import gold_finder as gf, data_loading as dl
+from src.helper import unit_conversion as uc
+from src.gold_finder import gold_finder as gf
+from src.gold_finder import data_loading as dl
 
 
 POSITIVE_DISTANCE_NM = 10  # units: nanometers, the leeway for a predicted gold particle position vs actual position
@@ -12,20 +14,27 @@ POSITIVE_DISTANCE_MICRONS = POSITIVE_DISTANCE_NM / 1000
 
 class AccuracyTest(TestCase):
     @staticmethod
-    def get_confusion_matrix(name, gold_locations, ground_truth_6nm, ground_truth_12nm):
+    def get_confusion_matrix(bundle: dl.ImageBundle, gold_locations):
         true_positive_12nm = 0
         true_positive_6nm = 0
         
         false_positive = 0
         
         for location in gold_locations:
+            # This value is true if the location is in the mask, false if it isn't
+            # This is required since, for some reason, the ground truth data also includes some particles that are not
+            # in the mask. To fix this, if the particle is outside the mask but is found in the ground truth data anyway
+            # count it as a true positive. But if the particle is outside the mask and is not found in the ground truth
+            # data, do *not* count it as a false positive.
+            in_mask: bool = bundle.mask.getpixel(location) != 255
+
             micron_location = uc.pixels_to_microns(*location)
 
-            distances_6nm = ((ground_truth_6nm["X"] - micron_location[0]) ** 2 +
-                             (ground_truth_6nm["Y"] - micron_location[1]) ** 2) ** 0.5
+            distances_6nm = np.sqrt((bundle.ground_truth_6nm["X"] - micron_location[0]) ** 2 +
+                                    (bundle.ground_truth_6nm["Y"] - micron_location[1]) ** 2)
             
-            distances_12nm = ((ground_truth_12nm["X"] - micron_location[0]) ** 2 +
-                              (ground_truth_12nm["Y"] - micron_location[1]) ** 2) ** 0.5
+            distances_12nm = np.sqrt((bundle.ground_truth_12nm["X"] - micron_location[0]) ** 2 +
+                                     (bundle.ground_truth_12nm["Y"] - micron_location[1]) ** 2)
 
             if any(distances_12nm <= POSITIVE_DISTANCE_MICRONS):
                 true_positive_12nm += 1
@@ -33,18 +42,18 @@ class AccuracyTest(TestCase):
             elif any(distances_6nm <= POSITIVE_DISTANCE_MICRONS):
                 true_positive_6nm += 1
             
-            else:
+            elif in_mask:
                 false_positive += 1
         
-        false_negitive_12nm = len(ground_truth_12nm) - true_positive_12nm
-        false_negitive_6nm = len(ground_truth_6nm) - true_positive_6nm
+        false_negitive_12nm = len(bundle.ground_truth_12nm) - true_positive_12nm
+        false_negitive_6nm = len(bundle.ground_truth_6nm) - true_positive_6nm
         
         confusion_matrix_df = pd.DataFrame({
             "12nm": [true_positive_12nm, false_negitive_12nm],
             "6nm": [true_positive_6nm, false_negitive_6nm]
         }, index=["true positive", "false negative"])
         
-        print(f"--- CONFUSION MATRIX FOR {name} ---")
+        print(f"--- CONFUSION MATRIX FOR {bundle.name} ---")
         print(f"false positives: {false_positive}")
         print(confusion_matrix_df)
         print()
@@ -69,14 +78,11 @@ class AccuracyTest(TestCase):
         
         # Calculate the gold locations and get the confusion matrices
         for bundle in image_bundles:
-            masked = masking.apply_mask(bundle.image, bundle.mask)
-            gold_locations = gf.GoldFinder(masked).find_gold()
+            gold_locations = gf.GoldFinder(bundle.image).find_gold()
             
             false_positives, confusion_matrix = self.get_confusion_matrix(
-                bundle.name,
-                gold_locations,
-                bundle.ground_truth_6nm,
-                bundle.ground_truth_12nm,
+                bundle,
+                gold_locations
             )
             
             sum_false_positives += false_positives
