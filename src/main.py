@@ -26,7 +26,7 @@ def main():
         if bundle.name != "S4":
             continue
         
-        apply_mask = False
+        apply_mask = True
         masked = masking.apply_mask(bundle.image, bundle.mask) if apply_mask else bundle.image
         
         gold_locations = gf.GoldFinder(masked).find_gold()

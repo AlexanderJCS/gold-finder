@@ -76,7 +76,7 @@ class AccuracyTest(TestCase):
                 bundle.name,
                 gold_locations,
                 bundle.ground_truth_6nm,
-                bundle.ground_truth_12nm
+                bundle.ground_truth_12nm,
             )
             
             sum_false_positives += false_positives
