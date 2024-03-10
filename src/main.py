@@ -44,7 +44,7 @@ def show_points_on_image(image, points):
         x=[coord[0] for coord in points],
         y=[coord[1] for coord in points],
         c="red",
-        alpha=0.25,
+        alpha=0.5,
         s=5
     )
     
