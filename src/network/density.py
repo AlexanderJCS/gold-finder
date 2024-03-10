@@ -35,4 +35,4 @@ def density(points: list[tuple[Number, Number]]) -> float:
     
     network = gen_network(points)
     total_weight = sum(network.edges[edge]["weight"] for edge in network.edges)
-    return len(points) / total_weight
+    return len(points) / total_weight * 100  # multiply by 100 so the density values aren't insanely small
