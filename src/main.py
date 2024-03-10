@@ -1,6 +1,9 @@
 import argparse
 
+from PIL import Image
+
 import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
 
 from src.gold_finder import data_loading as dl
@@ -35,10 +38,36 @@ def get_args() -> argparse.Namespace:
         help="Whether to display the image with the gold particles marked on it. Default: False"
     )
     
+    parser.add_argument(
+        "--dataloc",
+        type=str,
+        default=None,
+        help="The location to store the data CSV file. If not specified, the data will not be saved."
+    )
+    
+    parser.add_argument(
+        "--figloc",
+        type=str,
+        default=None,
+        help="The location to store the figure shown with the -m flag. If not specified, the figure will not be saved."
+    )
+    
     return parser.parse_args()
 
 
-def show_points_on_image(image, clusters):
+def show_points_on_image(image: Image, clusters: dict, display: bool, save_to: str) -> None:
+    """
+    Shows the image with the clusters and identified particles marked on it
+    
+    :param image: The base image to show
+    :param clusters: The clusters of particles
+    :param display: Whether to display the image
+    :param save_to: The location to save the figure to. If None, the figure will not be saved
+    """
+    
+    if not display and not save_to:
+        return  # no sense in doing any work
+    
     plt.imshow(np.array(image), cmap="gray")
     
     for cluster_num, cluster_values in clusters.items():
@@ -56,7 +85,37 @@ def show_points_on_image(image, clusters):
         for coord in cluster_values:
             plt.text(coord[0], coord[1], f"C: {cluster_num}", fontsize=7, color="white")
     
-    plt.show()
+    if display is True:
+        plt.show()
+    
+    if save_to is not None:
+        plt.savefig(save_to)
+
+
+def create_df_from_clusters(clusters: dict) -> pd.DataFrame:
+    """
+    Creates a DataFrame from the clusters that can be saved as a CSV file
+    
+    :param clusters: The clusters of particles
+    :return: A DataFrame of the clusters
+    """
+    
+    df = pd.DataFrame(columns=["x", "y", "cluster_id", "cluster_density"])
+    
+    rows_list = []
+    
+    for cluster_num, cluster_values in clusters.items():
+        cluster_density = density.density(cluster_values)
+        
+        for coord in cluster_values:
+            rows_list.append({
+                "x": coord[0],
+                "y": coord[1],
+                "cluster_id": cluster_num,
+                "cluster_density": cluster_density
+            })
+    
+    return pd.DataFrame(rows_list)
 
 
 def main():
@@ -75,14 +134,16 @@ def main():
     image = masking.apply_mask(bundle.image, bundle.mask) if args.mask else bundle.image
     
     gold_locations = gf.GoldFinder(image, img_luminosity=img_luminosity).find_gold()
-    density_score = density.density(gold_locations)
-    
     clusters = clustering.gold_cluster(gold_locations, image.size)
     
-    print(f"{density_score=}")
+    output_data = create_df_from_clusters(clusters)
     
-    if args.visual is True:
-        show_points_on_image(image, clusters)
+    print(output_data)
+    
+    if args.dataloc is not None:
+        output_data.to_csv(args.dataloc, index=False)
+    
+    show_points_on_image(image, clusters, args.visual, args.figloc)
 
 
 if __name__ == "__main__":
