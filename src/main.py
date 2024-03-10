@@ -5,6 +5,7 @@ import numpy as np
 
 from src.gold_finder import data_loading as dl
 from src.gold_finder import gold_finder as gf
+from src.clustering import clustering
 from src.helper import masking
 from src.network import density
 
@@ -37,16 +38,23 @@ def get_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def show_points_on_image(image, points):
+def show_points_on_image(image, clusters):
     plt.imshow(np.array(image), cmap="gray")
     
-    plt.scatter(
-        x=[coord[0] for coord in points],
-        y=[coord[1] for coord in points],
-        c="red",
-        alpha=0.5,
-        s=5
-    )
+    for cluster_num, cluster_values in clusters.items():
+        cluster_color = np.random.rand(3,)
+        
+        plt.scatter(
+            x=[coord[0] for coord in cluster_values],
+            y=[coord[1] for coord in cluster_values],
+            label=f"Cluster {cluster_num}",
+            alpha=0.9,
+            color=cluster_color,
+            s=7
+        )
+        
+        for coord in cluster_values:
+            plt.text(coord[0], coord[1], f"C: {cluster_num}", fontsize=7, color="white")
     
     plt.show()
 
@@ -69,10 +77,12 @@ def main():
     gold_locations = gf.GoldFinder(image, img_luminosity=img_luminosity).find_gold()
     density_score = density.density(gold_locations)
     
+    clusters = clustering.gold_cluster(gold_locations, image.size)
+    
     print(f"{density_score=}")
     
     if args.visual is True:
-        show_points_on_image(image, gold_locations)
+        show_points_on_image(image, clusters)
 
 
 if __name__ == "__main__":
