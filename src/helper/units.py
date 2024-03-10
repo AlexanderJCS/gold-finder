@@ -14,7 +14,7 @@ def pixels_to_microns(*args: int, pixels_per_micron: float = PIXEL_PER_MICRON) -
     return tuple(arg / pixels_per_micron for arg in args)
 
 
-def micron_to_pixels(*args: float, pixels_per_micron: float = PIXEL_PER_MICRON) -> tuple[int, ...]:
+def microns_to_pixels(*args: float, pixels_per_micron: float = PIXEL_PER_MICRON) -> tuple[int, ...]:
     """
     Converts micron coordinates to pixels
     

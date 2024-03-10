@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-import src.helper.unit_conversion as uc
+import src.helper.units as uc
 
 import random
 
@@ -10,7 +10,7 @@ class TestUnitConversion(TestCase):
         for i in range(100_000):
             rand_coords = (random.randint(0, 1000), random.randint(0, 1000))
 
-            px_mic_px = uc.pixels_to_microns(*uc.micron_to_pixels(*rand_coords))
+            px_mic_px = uc.pixels_to_microns(*uc.microns_to_pixels(*rand_coords))
             
             # pixels to microns to pixels
             for coord1, coord2 in zip(rand_coords, px_mic_px):
@@ -21,7 +21,7 @@ class TestUnitConversion(TestCase):
                     delta=0.001
                 )
             
-            mic_px_mic = uc.micron_to_pixels(*uc.pixels_to_microns(*rand_coords),)
+            mic_px_mic = uc.microns_to_pixels(*uc.pixels_to_microns(*rand_coords), )
             
             # microns to pixels to microns
             for coord1, coord2 in zip(rand_coords, mic_px_mic):
@@ -29,7 +29,7 @@ class TestUnitConversion(TestCase):
                     coord1,
                     coord2,
                     delta=1,
-                    msg=f"failed on iteration {i}| microns to pixels: {uc.micron_to_pixels(*rand_coords)}"
+                    msg=f"failed on iteration {i}| microns to pixels: {uc.microns_to_pixels(*rand_coords)}"
                 )
     
     def test_pixels_to_nm(self):

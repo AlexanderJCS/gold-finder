@@ -3,10 +3,8 @@ import numpy as np
 
 from unittest import TestCase
 
-from src.helper import unit_conversion as uc
+from src.helper import units as uc, data_loading as dl
 from src.gold_finder import gold_finder as gf
-from src.gold_finder import data_loading as dl
-
 
 POSITIVE_DISTANCE_NM = 10  # units: nanometers, the leeway for a predicted gold particle position vs actual position
 POSITIVE_DISTANCE_MICRONS = POSITIVE_DISTANCE_NM / 1000
