@@ -6,10 +6,14 @@ import numpy as np
 
 
 class GoldFinder:
-    def __init__(self, image: Image, mask_threshold: float = 0.7, circle_threshold: float = 0.4, min_pixels: int = 15):
+    def __init__(self, image: Image, img_luminosity: float | None = None, mask_threshold: float = 0.7,
+                 circle_threshold: float = 0.4, min_pixels: int = 15):
         """
         
         :param image: The image (which only has a luminosity channel) to analyze
+        :param img_luminosity: The average luminosity of the original image. This is useful if the provided image is
+                            masked. Providing the average luminosity of the original image will provide slightly more
+                            accurate results. If None, it will be calculated from the image parameter.
         :param mask_threshold: The percnt lower than the average luminosity that a pixel must be to be considered part
                                 of a splotch
         :param circle_threshold: The percentage of points that must be within the inscribed circle for the splotch to be
@@ -19,6 +23,7 @@ class GoldFinder:
         
         self.image = image
         
+        self.img_luminosity = img_luminosity
         self.mask_threshold = mask_threshold
         self.circle_threshold = circle_threshold
         self.min_pixels = min_pixels
@@ -29,7 +34,9 @@ class GoldFinder:
         :return: A list of coordinates of the gold particles, in pixels
         """
         
-        masked = self.mask_on_luminosity(self.get_avg_luminosity() * self.mask_threshold)
+        luminosity = self.img_luminosity if self.img_luminosity is not None else self.get_avg_luminosity(self.image)
+        
+        masked = self.mask_on_luminosity(luminosity * self.mask_threshold)
         bool_array = np.array(masked.getdata()).reshape(masked.size[::-1])
         
         original_recursion_limit = sys.getrecursionlimit()
@@ -42,8 +49,16 @@ class GoldFinder:
         # flip the x and y for some reason
         return [(coord[1], coord[0]) for coord in circle_coords]
     
-    def get_avg_luminosity(self) -> float:
-        image_array = np.array(self.image.getdata())
+    @staticmethod
+    def get_avg_luminosity(image: Image) -> float:
+        """
+        Returns the average luminosity of an image
+        
+        :param image: The image to get the average luminosity of
+        :return: The average luminosity of the image
+        """
+        
+        image_array = np.array(image.getdata())
         filtered_array = image_array[image_array < 255]
         # filter the array to remove white pixels since applying the
         # mask will make all masked pixels white. This can skew results

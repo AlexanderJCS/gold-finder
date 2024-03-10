@@ -60,11 +60,13 @@ def main():
     if args.name not in bundle_dict:
         print(f"Dataset '{args.name}' not found")
         return
-        
+    
     bundle = bundle_dict[args.name]
+    
+    img_luminosity = gf.GoldFinder.get_avg_luminosity(bundle.image)
     image = masking.apply_mask(bundle.image, bundle.mask) if args.mask else bundle.image
     
-    gold_locations = gf.GoldFinder(image).find_gold()
+    gold_locations = gf.GoldFinder(image, img_luminosity=img_luminosity).find_gold()
     density_score = density.density(gold_locations)
     
     print(f"{density_score=}")
