@@ -33,7 +33,7 @@ View the help info by running the program with the `-h` flag:
 
 ```bash
 # from the repository's root dir
-$ python -m src.main -h
+$ python -m src.cli -h
 ```
 
 This will show the following help info:
@@ -56,7 +56,7 @@ To run the program, use the following command:
 
 ```bash
 # from the repository's root dir
-$ python -m src.main S1
+$ python -m src.cli S1
 
 # S1 is the name of the image bundle to analyze, e.g., "S1", "S4", "S7" etc.
 # See a full list by looking at the directory names in the "analyzed synapses" directory
