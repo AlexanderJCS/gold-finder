@@ -1,4 +1,4 @@
-PIXEL_PER_NM = 1.7897  # all images in the datset that I've seen has this scale
+PIXEL_PER_NM = 1.79  # all images in the datset that I've seen has this scale
 PIXEL_PER_MICRON = PIXEL_PER_NM * 1000
 
 
